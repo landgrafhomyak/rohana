@@ -1,0 +1,2 @@
+class BuildFailed(Exception):
+    pass

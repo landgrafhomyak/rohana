@@ -1,0 +1,56 @@
+from typing import Callable, Any, Tuple, TypeVar, Generic, NoReturn, final, overload, Literal, Protocol, Optional
+
+from .meta import rohana_generator, rohana_generator_meta
+
+
+@final
+class __CommandInterface(Protocol):
+    def __call__(self, generator_instance: rohana_generator, /, *argv: str) -> NoReturn: ...
+
+
+CMD_WR_CLB = TypeVar("CMD_WR_CLB", bound=__CommandInterface)
+
+
+@final
+class bound_command(Generic[CMD_WR_CLB]):
+    def __call__(self, *argv: str) -> NoReturn: ...
+
+    def __getattr__(self, a: str, /) -> Any: ...
+
+    def __getattribute__(self, a: str, /) -> Any: ...
+
+    def __setattr__(self, a: str, v: Any, /) -> NoReturn: ...
+
+    def __delattr__(self, a: str, /) -> NoReturn: ...
+
+
+@final
+class command_dependency_decorator:
+    def __call__(self, callable: CMD_WR_CLB, /) -> 'command[CMD_WR_CLB]': ...
+
+
+@final
+class command(Generic[CMD_WR_CLB]):
+    def __new__(cls, callable: CMD_WR_CLB) -> command[CMD_WR_CLB]: ...
+
+    @classmethod
+    def depends(cls, *args: str) -> command_dependency_decorator: ...
+
+    def __call__(self, generator_instance: rohana_generator, /, *args: str) -> NoReturn: ...
+
+    def __getattr__(self, a: str, /) -> Any: ...
+
+    def __getattribute__(self, a: str, /) -> Any: ...
+
+    def __setattr__(self, a: str, v: Any, /) -> NoReturn: ...
+
+    def __delattr__(self, a: str, /) -> NoReturn: ...
+
+    @overload
+    def __get__(self, instance: Literal[None], owner: rohana_generator_meta, /) -> bound_command[CMD_WR_CLB]: ...
+
+    @overload
+    def __get__(self, instance: rohana_generator, owner: Optional[type], /) -> NoReturn: ...
+
+    @overload
+    def __get__(self, instance: Optional[Any], owner: Optional[type], /) -> CMD_WR_CLB: ...

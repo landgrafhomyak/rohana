@@ -1049,7 +1049,6 @@ static struct PyModuleDef module_def = {
 PyMODINIT_FUNC PyInit__meta(void)
 {
     PyObject *module;
-    module = PyModule_Create(&module_def);
 
     if (PyType_Ready(&RohanaMeta_CommandDependencyDecorator_Type))
     {
@@ -1075,6 +1074,7 @@ PyMODINIT_FUNC PyInit__meta(void)
         return NULL;
     }
 
+    module = PyModule_Create(&module_def);
     if (module == NULL)
     {
         return NULL;
