@@ -16,6 +16,10 @@ setup(
         Extension(
             name="file_tree",
             sources=["rohana/file_tree.c"]
-        )
+        ),
+        # Extension(
+        #     name="tag_meta",
+        #     sources=["rohana/tag_meta.c"]
+        # )
     ]
 )
