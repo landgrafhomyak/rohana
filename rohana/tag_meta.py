@@ -1,10 +1,18 @@
+from .errors import BuildFailed
 from .parse_xml_pyhp import PlainText, Tag
 
 
-class UnexpectedTagError(Exception):
+class UnexpectedTagError(BuildFailed):
     def __init__(self, name):
-        super().__init__(f"<name>")
+        super().__init__(f"<{name}>")
         self.name = name
+
+
+class InvalidTagError(BuildFailed):
+    def __init__(self, name, msg):
+        super().__init__(f"<{name}>: {msg}")
+        self.name = name
+        self.msg = msg
 
 
 class pool:
@@ -39,7 +47,7 @@ class pool:
 
 class tag_meta(type):
     def __new__(mcs, name, bases, dct):
-        cls = super().__new__(mcs, name, tuple(k for k in bases if type(k) is tag_meta) or (tag,), dict())
+        cls = super().__new__(mcs, name, tuple(k for k in bases if type(k) is tag_meta) or (tag,), {**({"__classcell__": dct.pop("__classcell__")} if "__classcell__" in dct else dict())})
         cls.__pool_cache = dict()
         cls.__dct = dct
         cls.__orig_bases = bases
@@ -53,9 +61,9 @@ class tag_meta(type):
 
         bound = cls.__pool_cache.get(pool, None)
         if bound is None:
-            bound = super(bound_tag_meta, None).__new__(
+            bound = super(bound_tag_meta, bound_tag_meta).__new__(
                 bound_tag_meta,
-                f"{cls.__name__}[{pl !r}]", tuple(k[pl] if type(k) is tag_meta else k for k in cls.__orig_bases),
+                f"{cls.__name__}[{pl !r}]", tuple((bound_tag if k is tag else k[pl]) if type(k) is tag_meta else k for k in cls.__orig_bases),
                 {**cls.__dct, "__name__": f"{cls.__dct.get('__name__', cls.__name__)}[{pl !r}]", "__qualname__": f"{cls.__dct.get('__qualname__', cls.__name__)}[{pl !r}]"}
             )
             bound.__unbound__ = cls
@@ -106,3 +114,4 @@ bound_tag = super(bound_tag_meta, bound_tag_meta).__new__(
     (),
     {"__new__": bound_tag_new, "__qualname__": f"{__name__}.bound_tag"}
 )
+super(bound_tag_meta, bound_tag).__init__(None, None, None)

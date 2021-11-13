@@ -107,6 +107,9 @@ class Page(base_page):
     def __getitem__(self, item: str):
         return self.__sources.get(item, None)
 
+    def __iter__(self):
+        return iter(self.__sources.items())
+
 
 class Symbol(Page):
     __slots__ = "return_type", "args"

@@ -1,16 +1,16 @@
-from typing import Optional, Literal, List
+from typing import Optional, Literal, List, Tuple, Iterator
 
 from .errors import BuildFailed
 from .parse_xml_pyhp import Tag
-
 
 class base_page:
     pass
 
 
 class ExternalSource(base_page):
-    destination:str
-    local:bool
+    destination: str
+    local: bool
+
 
 class Redirect(ExternalSource):
     pass
@@ -19,14 +19,18 @@ class Redirect(ExternalSource):
 class Unchanged(ExternalSource):
     pass
 
+
 class Copy(ExternalSource):
     pass
+
 
 class Page(base_page):
     title: str
     head: Tag
 
     def __getitem__(self, item: str) -> Tag: ...
+
+    def __iter__(self) -> Iterator[Tuple[str, Tag]]: ...
 
 
 class Arg:

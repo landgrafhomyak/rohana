@@ -1,24 +1,37 @@
 from typing import overload, Union, Literal, Any, NoReturn, Generic, TypeVar, Type, final
 
-# from .parse_xml_pyhp import Tag
-Tag = None
+from .errors import BuildFailed
+from .parse_xml_pyhp import Tag, PlainText
 
 
 @final
-class UnexpectedTagError(Exception):
+class UnexpectedTagError(BuildFailed):
     name: str
+
+
+@final
+class InvalidTagError(BuildFailed):
+    name: str
+    msg: str
+
+    def __new__(self, name: str, msg: str) -> InvalidTagError: ...
 
 
 @final
 class pool:
     def __new__(cls, /) -> pool: ...
 
+    @overload
     def __call__(self: _PO, source: Tag, /) -> bound_tag[_PO]: ...
+
+    @overload
+    def __call__(self: _PO, source: PlainText, /) -> PlainText: ...
 
     def add(self, name: str, cls: tag_meta, /) -> NoReturn: ...
 
 
 _PO = TypeVar("_PO", bound=pool)
+
 
 @final
 class tag_meta(type):
