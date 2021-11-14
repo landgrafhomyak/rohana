@@ -1,7 +1,7 @@
 from typing import overload, Union, Literal, Any, NoReturn, Generic, TypeVar, Type, final
 
 from .errors import BuildFailed
-from .parse_xml_pyhp import Tag, PlainText
+from .parse_xml_pyhp import Tag as xml_tag, PlainText
 
 
 @final
@@ -22,7 +22,7 @@ class pool:
     def __new__(cls, /) -> pool: ...
 
     @overload
-    def __call__(self: _PO, source: Tag, /) -> bound_tag[_PO]: ...
+    def __call__(self: _PO, source: xml_tag, /) -> tag[_PO]: ...
 
     @overload
     def __call__(self: _PO, source: PlainText, /) -> PlainText: ...
@@ -35,47 +35,26 @@ _PO = TypeVar("_PO", bound=pool)
 
 @final
 class tag_meta(type):
-    def __new__(mcs, name, bases, dct) -> Type[tag]: ...
+    def __new__(mcs, name, bases, dct) -> tag_meta: ...
 
-    def __getitem__(cls: _UTM, pool: _PO, /) -> Type[_UTM, bound_tag[_PO]]: ...
-
-    @overload
-    def __subclasscheck__(cls, subclass: Union[tag_meta, bound_tag_meta], /) -> bool: ...
-
-    @overload
-    def __subclasscheck__(cls, subclass: type, /) -> Literal[False]: ...
-
-    @overload
-    def __instancecheck__(cls, instance: bound_tag, /) -> bool: ...
-
-    @overload
-    def __instancecheck__(cls, instance: Any, /) -> Literal[False]: ...
+    def __getitem__(cls, pool: _PO, /) -> tag_factory[_PO]: ...
 
 
-_UTM = TypeVar("_UTM", bound=tag_meta)
+class tag(Generic[_PO], metaclass=tag_meta):
+    def __new__(cls, source: xml_tag, /) -> NoReturn: ...
 
-
-class tag(metaclass=tag_meta):
-    def __new__(cls, source: Tag, /) -> NoReturn: ...
-
-
-@final
-class bound_tag_meta(type, Generic[_UTM, _PO]):
-    @property
-    def __unbound__(cls, /) -> _UTM: ...
-
-    @property
-    def __pool__(cls, /) -> _PO: ...
-
-    @overload
-    def __subclasscheck__(cls, subclass: Union[tag_meta, bound_tag_meta], /) -> bool: ...
-
-    @overload
-    def __subclasscheck__(cls, subclass: type, /) -> False: ...
-
-
-class bound_tag(Generic[_UTM, _PO], metaclass=bound_tag_meta[_UTM, _PO]):
     @property
     def __pool__(self, /) -> _PO: ...
 
-    def __new__(cls, source: Tag, /) -> bound_tag[_PO]: ...
+
+@final
+class tag_factory(Generic[_PO]):
+    def __call__(self, *args, **kwargs) -> tag[_PO]: ...
+
+
+@overload
+def istagbound(tag: tag_factory, /) -> Literal[True]: ...
+
+
+@overload
+def istagbound(tag: Any, /) -> Literal[False]: ...

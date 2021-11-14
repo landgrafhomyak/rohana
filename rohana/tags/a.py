@@ -1,4 +1,4 @@
-from ..tag_meta import tag, InvalidTagError, pool
+from ..tag_meta import tag, InvalidTagError
 
 
 class a(tag):
@@ -18,6 +18,3 @@ class a(tag):
 
         return self
 
-
-
-print(a[pool()], type(a[pool()]), a[pool()].__qualname__)
