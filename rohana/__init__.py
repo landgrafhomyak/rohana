@@ -7,8 +7,8 @@ from rohana.process_xml import Page
 from .environment import Environment, IndexMeta
 from .errors import BuildFailed
 from .parse_tree import parse_tree
-from .parse_xml_pyhp import parse as parse_xml
-from .tag_meta import pool
+from .parse_xml_pyhp import parse as parse_xml, Tag, PlainText
+from .node_meta import pool
 
 from .tags.a import a as tag_a
 
@@ -18,7 +18,6 @@ def build(
         *,
         output_dir="docs",
         root_url="/",
-        extra_tags=dict(),
         version_class=Version
 ):
     try:
@@ -51,8 +50,10 @@ def build(
                         raise BuildFailed(f"too many index files in {dir}")
                     index_exists = True
 
-        tag_pool = pool()
+
+        tag_pool = pool(lambda _t: _t.name, raw_node_class=Tag, plain_text_class=PlainText)
         for n in "a",:
+            print(globals()[f"tag_{n}"].mro())
             tag_pool.add(n, globals()[f"tag_{n}"])
 
         for i in tree.items():
@@ -63,7 +64,7 @@ def build(
                     print(i.path, i.value, lang, root_tag)
         print("checked")
 
-    # print()
+        # print()
         # versions = dict()
         # version_independent = set()
         # for subdir in source_dir.iterdir():

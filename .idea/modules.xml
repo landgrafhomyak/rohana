@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/rohana.iml" filepath="$PROJECT_DIR$/.idea/rohana.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../rohana-doc/.idea/rohana-doc.iml" filepath="$PROJECT_DIR$/../rohana-doc/.idea/rohana-doc.iml" />
     </modules>
   </component>
 </project>

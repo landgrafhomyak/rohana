@@ -1,20 +1,19 @@
-from ..tag_meta import tag, InvalidTagError
+from ..node_meta import node, InvalidNodeError
 
 
-class a(tag):
+class a(node):
     __slots__ = "href", "nolocal", "__children"
 
-    def __new__(cls, source):
-        self = super().__new__(cls, source)
+    def __init__(self, source):
+        super().__init__(source)
 
         if "href" not in source.params:
-            raise InvalidTagError("a", "'href' not specified")
+            raise Exception("a", "'href' not specified")
         self.href = source.params["href"]
         self.nolocal = "nolocal" in source.params
         if self.nolocal and source.params["nolocal"] is not None:
-            raise InvalidTagError("a", "'nolocal' mustn't has value")
+            raise InvalidNodeError("a", "'nolocal' mustn't has value")
 
         self.__children = [self.__pool__(child) for child in source.children]
 
-        return self
 
